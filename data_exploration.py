@@ -29,13 +29,17 @@ def count_all_duplicates(dupes):
 
 
 def exploration_summary():
-    df = retrieve_data("connection_graph.csv")
+    df = retrieve_data("connection_graph_unique.csv")
     row_count = len(df)
     duplicates = find_duplicates_in_data(df)
     dup_count = count_all_duplicates(duplicates)
     unique_count = row_count - dup_count
-    min_dupes = min(duplicates.values())
-    max_dupes = max(duplicates.values())
+    try:
+        min_dupes = min(duplicates.values())
+        max_dupes = max(duplicates.values())
+    except:
+        min_dupes = 0
+        max_dupes = 0
     print(f"Liczba wszystkich wierszy: {row_count}")
     print(f"Liczba duplikatów: {count_all_duplicates(duplicates)}")
     print(f"Liczba unikalnych wierszy: {unique_count}")

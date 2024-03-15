@@ -10,7 +10,8 @@ def create_unique_connections(file_name):
         unique_raw_csv_rows.add(csv_row)
 
     with codecs.open(get_data_source_path(file_name), "w", "utf-8") as f:
-        f.write("nr,company,line,departure_time,arrival_time,start_stop,end_stop,start_stop_lat,start_stop_lon,end_stop_lat,end_stop_lon\n")
+        csv_header = "nr,company,line,departure_time,arrival_time,start_stop,end_stop,start_stop_lat,start_stop_lon,end_stop_lat,end_stop_lon\n"
+        f.write(csv_header)
         i = 0
         for row in unique_raw_csv_rows:
             f.write(f"{i},"+ row + "\n")
