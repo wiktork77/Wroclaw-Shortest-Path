@@ -1,7 +1,5 @@
 import bisect
-from data_utilities import express_time_as_seconds, parse_time_to_custom_time
-
-
+from data_utilities import parse_time_to_custom_time
 
 
 class Stop:
@@ -43,7 +41,25 @@ class Execution:
         self.arrival_time = arrival_time
 
     def __repr__(self):
-        return f"({self.departure_time} -> {self.arrival_time})"
+        return f"({self.departure_time} -- {self.arrival_time})"
+
+    def __eq__(self, other):
+        return self.departure_time == other.departure_time
+
+    def __lt__(self, other):
+        return self.departure_time < other.departure_time
+
+    def __gt__(self, other):
+        return self.departure_time > other.departure_time
+
+
+class Graph:
+    def __init__(self, vertices, edges):
+        self._vertices = vertices
+        self._edges = edges
+
+    def contains_vertex(self, vertex):
+        return vertex in self._vertices
 
 
 def model_stops(row):
@@ -64,19 +80,28 @@ def model_execution(row):
     return execution
 
 
-def model_data(df):
-    uniq_stops = set()
+def model_graph_components(df):
+    vertices = {}
     edges = {}
     for row in df.itertuples():
         stop1, stop2 = model_stops(row)
-        uniq_stops.add(stop1)
-        uniq_stops.add(stop2)
+        if stop1 not in vertices:
+            vertices[stop1] = set()
+        if stop2 not in vertices:
+            vertices[stop2] = set()
+
+        vertices[stop1].add(stop2)
         connection = model_connection(stop1, stop2)
+        execution = model_execution(row)
         if connection not in edges:
-            execution = model_execution(row)
             edges[connection] = [execution]
+        else:
+            bisect.insort(edges[connection], execution)
+    return vertices, edges
 
-    for item in edges.items():
-        print(item)
 
+def model_graph(df):
+    vertices, edges = model_graph_components(df)
+    graph = Graph(vertices, edges)
+    return graph
 

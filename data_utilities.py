@@ -26,6 +26,18 @@ class CustomTime:
     def __repr__(self):
         return f"{self.hour}:{self.minute}:{self.second}"
 
+    def __add__(self, other):
+        hour = self.hour + other.hour
+        minute = self.minute + other.minute
+        second = self.second + other.second
+        if second >= 60:
+            second -= 60
+            minute += 1
+        if minute >= 60:
+            minute -= 60
+            hour += 1
+        return CustomTime(hour, minute, second)
+
 
 def get_data_source_path(file_name):
     current_dir = os.getcwd()
@@ -61,3 +73,7 @@ def parse_time_to_custom_time(time):
     split = time.split(":")
     custom_time = CustomTime(int(split[0]), int(split[1]), int(split[2]))
     return custom_time
+
+
+def find_closest_future_execution(current_time, executions):
+    pass
