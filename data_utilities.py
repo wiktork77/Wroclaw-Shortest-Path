@@ -4,6 +4,29 @@ import pandas as pd
 from IPython.display import display
 
 
+class CustomTime:
+    def __init__(self, hour, minute, second):
+        self.hour = hour
+        self.minute = minute
+        self.second = second
+
+    def __eq__(self, other):
+        return (self.hour, self.minute, self.second) == (other.hour, other.minute, other.second)
+
+    def __lt__(self, other):
+        self_seconds = express_time_as_seconds(self)
+        other_seconds = express_time_as_seconds(other)
+        return self_seconds < other_seconds
+
+    def __gt__(self, other):
+        self_seconds = express_time_as_seconds(self)
+        other_seconds = express_time_as_seconds(other)
+        return self_seconds > other_seconds
+
+    def __repr__(self):
+        return f"{self.hour}:{self.minute}:{self.second}"
+
+
 def get_data_source_path(file_name):
     current_dir = os.getcwd()
     paths_dir = os.path.join(current_dir, "data_sources")
@@ -30,3 +53,11 @@ def get_raw_row(series):
     return raw_row[:-1]
 
 
+def express_time_as_seconds(time_obj):
+    return time_obj.hour * 3600 + time_obj.minute * 60 + time_obj.second
+
+
+def parse_time_to_custom_time(time):
+    split = time.split(":")
+    custom_time = CustomTime(int(split[0]), int(split[1]), int(split[2]))
+    return custom_time

@@ -1,3 +1,9 @@
+import bisect
+from data_utilities import express_time_as_seconds, parse_time_to_custom_time
+
+
+
+
 class Stop:
     def __init__(self, name, latitude, longitude):
         self.name = name
@@ -15,13 +21,18 @@ class Stop:
 
 
 class Connection:
-    def __init__(self, start_stop, end_stop, executions):
+    def __init__(self, start_stop, end_stop):
         self.start_stop = start_stop
         self.end_stop = end_stop
-        self.executions = executions
 
     def __eq__(self, other):
         return (self.start_stop, self.end_stop) == (other.start_stop, other.end_stop)
+
+    def __hash__(self):
+        return hash((self.start_stop, self.end_stop))
+
+    def __repr__(self):
+        return f"({self.start_stop} -> {self.end_stop})"
 
 
 class Execution:
@@ -31,6 +42,9 @@ class Execution:
         self.departure_time = departure_time
         self.arrival_time = arrival_time
 
+    def __repr__(self):
+        return f"({self.departure_time} -> {self.arrival_time})"
+
 
 def model_stops(row):
     stop1 = Stop(row.start_stop, row.start_stop_lat, row.start_stop_lon)
@@ -38,35 +52,31 @@ def model_stops(row):
     return stop1, stop2
 
 
-def model_connection(row):
-    stop1, stop2 = model_stops(row)
+def model_connection(stop1, stop2):
+    connection = Connection(stop1, stop2)
+    return connection
 
 
-
+def model_execution(row):
+    dep_time = parse_time_to_custom_time(row.departure_time)
+    arr_time = parse_time_to_custom_time(row.arrival_time)
+    execution = Execution(row.company, row.line, dep_time, arr_time)
+    return execution
 
 
 def model_data(df):
-    # byc moze lepiej na poczatku zbudowac strukture, ktora bedzie zawierala polaczenia, a pozniej na podstawie tych
-    # polaczen zbudowac zbior unikalnych wierzcholkow (przystankow)
-    connections = []
+    uniq_stops = set()
+    edges = {}
     for row in df.itertuples():
         stop1, stop2 = model_stops(row)
-        pass
+        uniq_stops.add(stop1)
+        uniq_stops.add(stop2)
+        connection = model_connection(stop1, stop2)
+        if connection not in edges:
+            execution = model_execution(row)
+            edges[connection] = [execution]
 
-
-# zastanowic sie
-def model_connections(df)
-    pass
-
-
-
-def model_data_itertuples(df):
-    stops = model_stops(df)
-
-
-def model_data_iterrows(df):
-    for row in df.iterrows():
-        pass
-
+    for item in edges.items():
+        print(item)
 
 
