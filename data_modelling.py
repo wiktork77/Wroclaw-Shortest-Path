@@ -1,5 +1,5 @@
 import bisect
-from data_utilities import parse_time_to_custom_time
+from data_utilities import parse_time_to_datetime
 
 
 class Stop:
@@ -9,13 +9,13 @@ class Stop:
         self.longitude = longitude
 
     def __eq__(self, other):
-        return (self.name, self.latitude, self.longitude) == (other.name, other.latitude, other.longitude)
+        return self.name == other.name
 
     def __hash__(self):
-        return hash((self.name, self.latitude, self.longitude))
+        return hash(self.name)
 
     def __repr__(self):
-        return f"{self.name}: {self.latitude, self.longitude}"
+        return f"{self.name} ({self.latitude}, {self.longitude})"
 
 
 class Connection:
@@ -43,14 +43,11 @@ class Execution:
     def __repr__(self):
         return f"({self.departure_time} -- {self.arrival_time})"
 
-    def __eq__(self, other):
-        return self.departure_time == other.departure_time
+    def __gt__(self, other):
+        return self.arrival_time > other
 
     def __lt__(self, other):
-        return self.departure_time < other.departure_time
-
-    def __gt__(self, other):
-        return self.departure_time > other.departure_time
+        return self.arrival_time < other
 
 
 class Graph:
@@ -60,6 +57,37 @@ class Graph:
 
     def contains_vertex(self, vertex):
         return vertex in self._vertices
+
+    def get_vertices(self):
+        return self._vertices
+
+    def get_edges(self):
+        return self._edges
+
+    def get_stop(self, name):
+        for v in self._vertices.keys():
+            if v.name == name:
+                return v
+
+class QueueEntry:
+    def __init__(self, stop, cost):
+        self.stop = stop
+        self.cost = cost
+
+    def __eq__(self, other):
+        return self.cost == other.cost
+
+    def __lt__(self, other):
+        return self.cost < other.cost
+
+    def __gt__(self, other):
+        return self.cost > other.cost
+
+    def __hash__(self):
+        return hash(self.cost)
+
+    def __repr__(self):
+        return f"({self.stop} {self.cost})"
 
 
 def model_stops(row):
@@ -74,29 +102,60 @@ def model_connection(stop1, stop2):
 
 
 def model_execution(row):
-    dep_time = parse_time_to_custom_time(row.departure_time)
-    arr_time = parse_time_to_custom_time(row.arrival_time)
+    dep_time = parse_time_to_datetime(row.departure_time)
+    arr_time = parse_time_to_datetime(row.arrival_time)
     execution = Execution(row.company, row.line, dep_time, arr_time)
     return execution
 
 
+def compute_average_location(locations):
+    i, lat, lon = 0, 0, 0
+    for loc in locations:
+        lat += loc[0]
+        lon += loc[1]
+        i += 1
+    lat /= i
+    lon /= i
+    return lat, lon
+
+def model_generalized_stops(df):
+    stops_to_lat_lon = {}
+    generalized_stops = {}
+    for row in df.itertuples():
+        stop1, stop2 = model_stops(row)
+        if stop1 not in stops_to_lat_lon:
+            stops_to_lat_lon[stop1] = {(stop1.latitude, stop1.longitude)}
+        else:
+            stops_to_lat_lon[stop1].add((stop1.latitude, stop1.longitude))
+        if stop2 not in stops_to_lat_lon:
+            stops_to_lat_lon[stop2] = {(stop2.latitude, stop2.longitude)}
+        else:
+            stops_to_lat_lon[stop2].add((stop2.latitude, stop2.longitude))
+    for k, v in stops_to_lat_lon.items():
+        lat, lon = compute_average_location(v)
+        generalized_stops[k.name] = Stop(k.name, lat, lon)
+    return generalized_stops
+
+
 def model_graph_components(df):
+    generalized_stops = model_generalized_stops(df)
     vertices = {}
     edges = {}
     for row in df.itertuples():
-        stop1, stop2 = model_stops(row)
+        stop1, stop2 = generalized_stops[row.start_stop], generalized_stops[row.end_stop]
         if stop1 not in vertices:
-            vertices[stop1] = set()
+            vertices[stop1] = []
         if stop2 not in vertices:
-            vertices[stop2] = set()
+            vertices[stop2] = []
 
-        vertices[stop1].add(stop2)
+        if stop2 not in vertices[stop1]:
+            vertices[stop1].append(stop2)
         connection = model_connection(stop1, stop2)
         execution = model_execution(row)
         if connection not in edges:
             edges[connection] = [execution]
         else:
-            bisect.insort(edges[connection], execution)
+            edges[connection].append(execution)
     return vertices, edges
 
 
