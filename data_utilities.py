@@ -1,45 +1,9 @@
-import bisect
 import os
-import numpy as np
 import pandas as pd
 from datetime import datetime
 from IPython.display import display
 
 infinity = float('inf')
-
-# class CustomTime:
-#     def __init__(self, hour, minute, second):
-#         self.hour = hour
-#         self.minute = minute
-#         self.second = second
-#
-#     def __eq__(self, other):
-#         return (self.hour, self.minute, self.second) == (other.hour, other.minute, other.second)
-#
-#     def __lt__(self, other):
-#         self_seconds = express_time_as_seconds(self)
-#         other_seconds = express_time_as_seconds(other)
-#         return self_seconds < other_seconds
-#
-#     def __gt__(self, other):
-#         self_seconds = express_time_as_seconds(self)
-#         other_seconds = express_time_as_seconds(other)
-#         return self_seconds > other_seconds
-#
-#     def __repr__(self):
-#         return f"{self.hour}:{self.minute}:{self.second}"
-#
-#     def __add__(self, other):
-#         hour = self.hour + other.hour
-#         minute = self.minute + other.minute
-#         second = self.second + other.second
-#         if second >= 60:
-#             second -= 60
-#             minute += 1
-#         if minute >= 60:
-#             minute -= 60
-#             hour += 1
-#         return CustomTime(hour, minute, second)
 
 
 def get_data_source_path(file_name):
@@ -72,12 +36,6 @@ def express_time_as_seconds(time_obj):
     return time_obj.hour * 3600 + time_obj.minute * 60 + time_obj.second
 
 
-# def parse_time_to_custom_time(time):
-#     split = time.split(":")
-#     custom_time = CustomTime(int(split[0]), int(split[1]), int(split[2]))
-#     return custom_time
-
-
 def parse_time_to_datetime(time):
     split = time.split(":")
     day, hour, minute, second = 1, int(split[0]), int(split[1]), int(split[2])
@@ -88,7 +46,7 @@ def parse_time_to_datetime(time):
     return dtime
 
 
-def find_best_future_execution(current_time, executions, last_line=None):
+def find_best_future_execution_time(current_time, executions):
     lowest_cost = infinity
     best = None
     for execution in executions:
@@ -101,3 +59,40 @@ def find_best_future_execution(current_time, executions, last_line=None):
     return best
 
 
+def find_best_future_execution_change(current_time, executions, current_line):
+    if current_line is None:
+        return find_best_future_execution_time(current_time, executions)
+
+    best_executions = [execution for execution in executions if execution.departure_time >= current_time and execution.line == current_line]
+    if not best_executions:
+        best_alternative = min([execution for execution in executions if execution.departure_time >= current_time], key=lambda x: x.departure_time - current_time, default=None)
+        return best_alternative
+    else:
+        return min(best_executions, key=lambda x: x.departure_time - current_time)
+
+
+def find_best_execution(current_time, executions, criteria, current_line=None):
+    if criteria == 't':
+        return find_best_future_execution_time(current_time, executions)
+    elif criteria == 'p':
+        return find_best_future_execution_change(current_time, executions, current_line)
+
+
+def reconstruct_path(previous, source, destination):
+    current = destination
+    path = [previous[current]]
+
+    while True:
+        current = previous[current][0]
+        if current == source:
+            break
+        path.append(previous[current])
+
+    path.reverse()
+    return path
+
+
+def compute_execution_duration(execution):
+    result = execution.arrival_time - execution.departure_time
+    result = int(result.seconds / 60)
+    return result

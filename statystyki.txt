@@ -1,3 +1,4 @@
 (Strzegomska (krzyżówka): (51.112399, 16.960929) -> Nowodworska: (51.113844, 16.964955)) - 1060 executions
 Unikalne przystanki (nazwa,lat,lon): 2284
+Unikalnie przystanki po generalizacji (unikalnośc ze względu na nazwę): 939
 Połączenia między przystankami (nie wliczając w to sposobów realizacji): 3163

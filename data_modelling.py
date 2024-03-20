@@ -1,4 +1,3 @@
-import bisect
 from data_utilities import parse_time_to_datetime
 
 
@@ -41,7 +40,7 @@ class Execution:
         self.arrival_time = arrival_time
 
     def __repr__(self):
-        return f"({self.departure_time} -- {self.arrival_time})"
+        return f"({self.departure_time} -- {self.arrival_time}) {self.line}"
 
     def __gt__(self, other):
         return self.arrival_time > other
@@ -156,6 +155,8 @@ def model_graph_components(df):
             edges[connection] = [execution]
         else:
             edges[connection].append(execution)
+    print("wierzcholki")
+    print(len(vertices))
     return vertices, edges
 
 
