@@ -3,6 +3,7 @@ import heapq
 from data_modelling import QueueEntry, Connection
 from data_presentation import present_path_verbose
 from data_utilities import parse_time_to_datetime, find_best_execution, reconstruct_path
+import time as t
 
 infinity = float('inf')
 
@@ -30,8 +31,9 @@ def compute_cost(current_time, execution):
 
 
 def dsp(graph, source, destination, start_time):
+    start = t.time()
     source, destination = graph.get_stop(source), graph.get_stop(destination)
-    distance = {}
+    cost_dict = {}
     previous = {}
     vertices = graph.get_vertices()
     edges = graph.get_edges()
@@ -39,15 +41,15 @@ def dsp(graph, source, destination, start_time):
     destination_found = False
 
     for v in vertices:
-        distance[v] = infinity
-    distance[source] = 0
+        cost_dict[v] = infinity
+    cost_dict[source] = 0
 
     queue = []
     heapq.heappush(queue, QueueEntry(source, 0))
 
     while queue:
         current = heapq.heappop(queue).stop
-        time_change = datetime.timedelta(minutes=distance[current])
+        time_change = datetime.timedelta(minutes=cost_dict[current])  # bo cost = time (w tym przypadku)
         current_time = start_time + time_change
         if current == destination:
             destination_found = True
@@ -58,18 +60,18 @@ def dsp(graph, source, destination, start_time):
             if locally_best_execution is None:
                 cost = infinity  # czyli jesli nie ma zadnego polaczenia w przyszlosci !
             else:
-                cost = distance[current] + compute_cost(current_time, locally_best_execution)
-            if cost < distance[neighbor]:
-                distance[neighbor] = cost
+                cost = cost_dict[current] + compute_cost(current_time, locally_best_execution)
+            if cost < cost_dict[neighbor]:
+                cost_dict[neighbor] = cost
                 previous[neighbor] = (current, Connection(current, neighbor), locally_best_execution)
                 heapq.heappush(queue, QueueEntry(neighbor, cost))
 
     if destination_found:
         path = reconstruct_path(previous, source, destination)
-        present_path_verbose(path)
-        return path, distance[destination]
+        end = t.time()
+        computation_time = end - start
+        return path, cost_dict[destination], computation_time
     else:
-        print("No path to destination found!")
         return None
 
 

@@ -96,3 +96,17 @@ def compute_execution_duration(execution):
     result = execution.arrival_time - execution.departure_time
     result = int(result.seconds / 60)
     return result
+
+
+def count_line_changes(path):
+    changes = 0
+    last_line = path[0][2].line
+    for n in path:
+        if n[2].line != last_line:
+            changes += 1
+            last_line = n[2].line
+    return changes
+
+
+
+

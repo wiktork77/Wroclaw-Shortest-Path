@@ -1,15 +1,15 @@
 import datetime
 import heapq
 from data_modelling import Connection, QueueEntry
-from data_presentation import present_path_verbose
-from data_utilities import parse_time_to_datetime, find_best_future_execution_change, reconstruct_path
-from cost_strategies import compute_time, compute_p_cost
+from data_utilities import parse_time_to_datetime, reconstruct_path, find_best_execution
+from cost_strategies import compute_time, compute_cost
 import time as t
 
 infinity = float('inf')
 
 
-def astar2(graph, source, destination, start_time, heuristic):
+def astar(graph, source, destination, start_time, heuristic, criteria):
+    start = t.time()
     source, destination = graph.get_stop(source), graph.get_stop(destination)
     path_cost = {}
     time_elapsed = {}
@@ -18,9 +18,6 @@ def astar2(graph, source, destination, start_time, heuristic):
     edges = graph.get_edges()
     start_time = parse_time_to_datetime(start_time)
     destination_found = False
-
-    exec_finding_time = 0
-    exec_finding_count = 0
 
     for v in vertices:
         path_cost[v] = infinity
@@ -40,18 +37,14 @@ def astar2(graph, source, destination, start_time, heuristic):
             break
         neighbors = vertices[current]
         for neighbor in neighbors:
-            start = t.time()
-            locally_best_execution = find_best_future_execution_change(current_time, edges[Connection(current, neighbor)], previous[current][2].line if current in previous else None)
-            end = t.time()
-            exec_finding_time += end - start
-            exec_finding_count += 1
+            locally_best_execution = find_best_execution(current_time, edges[Connection(current, neighbor)], criteria, previous[current][2].line if current in previous else None)
             heuristic_value = 0
             if locally_best_execution is None:
                 cost = infinity  # czyli jesli nie ma zadnego polaczenia w przyszlosci !
                 time = infinity
             else:
                 heuristic_value = heuristic(neighbor, destination)
-                cost = path_cost[current] + compute_p_cost(current_time, locally_best_execution, previous[current][2].line if current in previous else None, heuristic_value)
+                cost = path_cost[current] + compute_cost(criteria, current_time, locally_best_execution, previous[current][2].line if current in previous else None, heuristic_value)
                 time = time_elapsed[current] + compute_time(current_time, locally_best_execution)
             if cost < path_cost[neighbor]:
                 path_cost[neighbor] = cost
@@ -61,16 +54,9 @@ def astar2(graph, source, destination, start_time, heuristic):
 
     if destination_found:
         path = reconstruct_path(previous, source, destination)
-        present_path_verbose(path)
-        print(previous[destination][2].departure_time)
-        print(f"Time spent on finding exec: {exec_finding_time}")
-        print(f"Count: {exec_finding_count}")
-        return path, time_elapsed[destination]
+        end = t.time()
+        computation_time = end - start
+        return path, time_elapsed[destination], computation_time
     else:
-        print("No path to destination found!")
         return None
-
-
-
-
 

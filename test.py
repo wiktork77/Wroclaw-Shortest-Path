@@ -1,9 +1,7 @@
-from data_utilities import retrieve_data
+from data_utilities import retrieve_data, count_line_changes
 from data_modelling import model_graph, Stop
 from dijkstra import dsp
-from astar_v1 import astar
-from astar_v2 import astar2
-from data_presentation import present_graph, present_path
+from astar import astar
 from dijkstra import reconstruct_path
 from metrics.time_metrics import measure_computation_time
 from heuristics import euclidean_distance, manhattan_distance, chebyshev_distance
@@ -27,11 +25,3 @@ test_entries = [
     ("Maślicka (Osiedle)", "Iwiny - Kolejowa", "16:07:00"),
     ("Małkowice - Główna", "Kiełczów - Zgodna", "10:39:00")
 ]
-
-for entry in test_entries:
-    measure_computation_time("astar2", astar2, graph, entry[0], entry[1], entry[2], euclidean_distance)
-
-
-
-
-

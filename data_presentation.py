@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 infinity = float('inf')
 
 
@@ -11,19 +10,6 @@ def present_graph(graph):
         y.append(v.latitude)
     plt.scatter(x, y, s=5)
 
-
-def present_path(path, graph):
-    present_graph(graph)
-    lat, lon = [], []
-    for tpl in path:
-        start, stop = tpl[1].start_stop, tpl[1].end_stop
-        lat.append(start.latitude)
-        lat.append(stop.latitude)
-        lon.append(start.longitude)
-        lon.append(start.longitude)
-        plt.plot([start.longitude, stop.longitude], [start.latitude, stop.latitude], color='red')
-    lat_min, lat_max, lon_min, lon_max = min(lat), max(lat), min(lon), max(lon)
-    plt.show()
 
 def present_path_verbose(path):
     pad_length = 45

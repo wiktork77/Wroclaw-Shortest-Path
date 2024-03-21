@@ -68,6 +68,7 @@ class Graph:
             if v.name == name:
                 return v
 
+
 class QueueEntry:
     def __init__(self, stop, cost):
         self.stop = stop
@@ -117,6 +118,7 @@ def compute_average_location(locations):
     lon /= i
     return lat, lon
 
+
 def model_generalized_stops(df):
     stops_to_lat_lon = {}
     generalized_stops = {}
@@ -155,8 +157,6 @@ def model_graph_components(df):
             edges[connection] = [execution]
         else:
             edges[connection].append(execution)
-    print("wierzcholki")
-    print(len(vertices))
     return vertices, edges
 
 
