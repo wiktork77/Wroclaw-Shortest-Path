@@ -1,10 +1,8 @@
-from data_utilities import retrieve_data, count_line_changes
-from data_modelling import model_graph
-from dijkstra import dsp
-from astar import astar
+from data_processing.data_utilities import retrieve_data
+from data_processing.data_modelling import model_graph
+from algorithms.astar import astar
 import random
-from datetime import datetime
-from heuristics import euclidean_distance, manhattan_distance, chebyshev_distance
+from cost_computations.heuristics import euclidean_distance, manhattan_distance, chebyshev_distance
 import codecs
 
 
@@ -61,15 +59,15 @@ def compare_astar_heuristics_time():
             euclidean_results.append(euclidean_result)
             manhattan_results.append(manhattan_result)
             chebyshev_results.append(chebyshev_result)
-    with codecs.open("./statistics_results/astar_heuristic_comparison/euclidean.csv", "w", "utf-8") as f:
+    with codecs.open("../statistics_results/astar_heuristic_comparison/euclidean.csv", "w", "utf-8") as f:
         for result in euclidean_results:
             path, cost, time = result
             f.write(f"{len(path)},{cost},{time}\n")
-    with codecs.open("./statistics_results/astar_heuristic_comparison/manhattan.csv", "w", "utf-8") as f:
+    with codecs.open("../statistics_results/astar_heuristic_comparison/manhattan.csv", "w", "utf-8") as f:
         for result in manhattan_results:
             path, cost, time = result
             f.write(f"{len(path)},{cost},{time}\n")
-    with codecs.open("statistics_results/astar_heuristic_comparison/chebyshev.csv", "w", "utf-8") as f:
+    with codecs.open("../statistics_results/astar_heuristic_comparison/chebyshev.csv", "w", "utf-8") as f:
         for result in chebyshev_results:
             path, cost, time = result
             f.write(f"{len(path)},{cost},{time}\n")

@@ -1,8 +1,8 @@
 import datetime
 import heapq
-from data_modelling import Connection, QueueEntry
-from data_utilities import parse_time_to_datetime, reconstruct_path, find_best_execution
-from cost_strategies import compute_time, compute_cost
+from data_processing.data_modelling import Connection, QueueEntry
+from data_processing.data_utilities import parse_time_to_datetime, reconstruct_path, find_best_execution
+from cost_computations.cost_strategies import compute_time, compute_cost
 import time as t
 
 infinity = float('inf')

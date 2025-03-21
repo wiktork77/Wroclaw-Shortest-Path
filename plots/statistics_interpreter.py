@@ -4,9 +4,9 @@ import numpy as np
 
 
 def interpret_heuristics_comparison():
-    df_euclidean = pd.read_csv("./statistics_results/astar_heuristic_comparison/euclidean.csv")
-    df_manhattan = pd.read_csv("./statistics_results/astar_heuristic_comparison/manhattan.csv")
-    df_chebyshev = pd.read_csv("./statistics_results/astar_heuristic_comparison/chebyshev.csv")
+    df_euclidean = pd.read_csv("../statistics_results/astar_heuristic_comparison/euclidean.csv")
+    df_manhattan = pd.read_csv("../statistics_results/astar_heuristic_comparison/manhattan.csv")
+    df_chebyshev = pd.read_csv("../statistics_results/astar_heuristic_comparison/chebyshev.csv")
 
     data = [df_euclidean, df_manhattan, df_chebyshev]
 
@@ -35,8 +35,8 @@ def interpret_heuristics_comparison():
 
 
 def interpret_dijkstra_vs_astar():
-    df_astar = pd.read_csv("./statistics_results/dijkstra_vs_astar/astar.csv")
-    df_dijkstra = pd.read_csv("./statistics_results/dijkstra_vs_astar/dijkstra.csv")
+    df_astar = pd.read_csv("../statistics_results/dijkstra_vs_astar/astar.csv")
+    df_dijkstra = pd.read_csv("../statistics_results/dijkstra_vs_astar/dijkstra.csv")
     data = [df_astar, df_dijkstra]
     p_len_mean = []
     cost_mean = []
@@ -67,8 +67,8 @@ def interpret_ch_cost():
     x = []
     time = []
     diff = []
-    df_scalar = pd.read_csv("./statistics_results/astar_ch_cost/scalar.csv")
-    df_heuristic = pd.read_csv("./statistics_results/astar_ch_cost/heuristic.csv")
+    df_scalar = pd.read_csv("../statistics_results/astar_ch_cost/scalar.csv")
+    df_heuristic = pd.read_csv("../statistics_results/astar_ch_cost/heuristic.csv")
     val_group = df_scalar.groupby('ch_val').mean()
     for item in val_group.itertuples():
         x.append(item.Index)

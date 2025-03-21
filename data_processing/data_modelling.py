@@ -1,4 +1,4 @@
-from data_utilities import parse_time_to_datetime
+from data_processing.data_utilities import parse_time_to_datetime
 
 
 class Stop:

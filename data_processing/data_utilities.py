@@ -38,7 +38,7 @@ def express_time_as_seconds(time_obj):
 
 def parse_time_to_datetime(time):
     split = time.split(":")
-    day, hour, minute, second = 1, int(split[0]), int(split[1]), int(split[2])
+    day, hour, minute, second = 1, int(split[0]), int(split[1]), 0
     if hour >= 24:
         hour -= 24
         day += 1

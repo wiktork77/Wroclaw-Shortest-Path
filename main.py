@@ -1,12 +1,9 @@
-import sys
-
-from data_modelling import model_graph
-from data_utilities import retrieve_data, count_line_changes
-from heuristics import euclidean_distance
-from data_presentation import present_path_verbose
-from metrics.time_metrics import measure_computation_time
-from dijkstra import dsp
-from astar import astar
+from data_processing.data_modelling import model_graph
+from data_processing.data_utilities import retrieve_data, count_line_changes
+from cost_computations.heuristics import euclidean_distance
+from data_processing.data_presentation import present_path_verbose
+from algorithms.dijkstra import dsp
+from algorithms.astar import astar
 
 
 def run():
