@@ -68,6 +68,12 @@ class Graph:
             if v.name == name:
                 return v
 
+    def get_vertices_names(self):
+        names = []
+        for k in self._vertices.keys():
+            names.append(k.name)
+        return names
+
 
 class QueueEntry:
     def __init__(self, stop, cost):

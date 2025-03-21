@@ -1,12 +1,16 @@
+import sys
+
+from GUI.window import Ui_MainWindow
 from data_processing.data_modelling import model_graph
 from data_processing.data_utilities import retrieve_data, count_line_changes
 from cost_computations.heuristics import euclidean_distance
 from data_processing.data_presentation import present_path_verbose
 from algorithms.dijkstra import dsp
 from algorithms.astar import astar
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 
-def run():
+def run1():
     print("Reading data...")
     df = retrieve_data("connection_graph_unique.csv")
     graph = model_graph(df)
@@ -28,6 +32,18 @@ def run():
             print(f"Czas obliczen: {computation_time}s")
             print(f"Czas podrozy: {travel_time}")
             print(f"Liczba przesiadek: {count_line_changes(path)}")
+
+
+def run():
+    df = retrieve_data("connection_graph_unique.csv")
+    graph = model_graph(df)
+
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow(graph)
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
