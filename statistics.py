@@ -8,11 +8,11 @@ from heuristics import euclidean_distance, manhattan_distance, chebyshev_distanc
 import codecs
 
 
-# def random_time():
-#     hour = random.randint(0, 28)
-#     minute = random.randint(0, 59)
-#     return f"{hour}:{minute}:00"
-#
+def random_time():
+    hour = random.randint(0, 28)
+    minute = random.randint(0, 59)
+    return f"{hour}:{minute}:00"
+
 #
 # def compare_dijkstra_astar_time():
 #     df = retrieve_data("connection_graph_unique.csv")
@@ -40,39 +40,39 @@ import codecs
 #             path, cost, time = result
 #             f.write(f"{len(path)},{cost},{time}\n")
 #
-# def compare_astar_heuristics_time():
-#     df = retrieve_data("connection_graph_unique.csv")
-#     graph = model_graph(df)
-#     vertices = list(graph.get_vertices().keys())
-#     euclidean_results = []
-#     manhattan_results = []
-#     chebyshev_results = []
-#
-#     while len(euclidean_results) < 750:
-#         v1 = random.choice(vertices).name
-#         v2 = random.choice(vertices).name
-#         while v2 == v1:
-#             v2 = random.choice(vertices).name
-#         r_time = random_time()
-#         euclidean_result = astar(graph, v1, v2, r_time, euclidean_distance, 't')
-#         manhattan_result = astar(graph, v1, v2, r_time, manhattan_distance, 't')
-#         chebyshev_result = astar(graph, v1, v2, r_time, chebyshev_distance, 't')
-#         if euclidean_result is not None:
-#             euclidean_results.append(euclidean_result)
-#             manhattan_results.append(manhattan_result)
-#             chebyshev_results.append(chebyshev_result)
-#     with codecs.open("./statistics_results/astar_heuristic_comparison/euclidean.csv", "w", "utf-8") as f:
-#         for result in euclidean_results:
-#             path, cost, time = result
-#             f.write(f"{len(path)},{cost},{time}\n")
-#     with codecs.open("./statistics_results/astar_heuristic_comparison/manhattan.csv", "w", "utf-8") as f:
-#         for result in manhattan_results:
-#             path, cost, time = result
-#             f.write(f"{len(path)},{cost},{time}\n")
-#     with codecs.open("statistics_results/astar_heuristic_comparison/chebyshev.csv", "w", "utf-8") as f:
-#         for result in chebyshev_results:
-#             path, cost, time = result
-#             f.write(f"{len(path)},{cost},{time}\n")
+def compare_astar_heuristics_time():
+    df = retrieve_data("connection_graph_unique.csv")
+    graph = model_graph(df)
+    vertices = list(graph.get_vertices().keys())
+    euclidean_results = []
+    manhattan_results = []
+    chebyshev_results = []
+
+    while len(euclidean_results) < 750:
+        v1 = random.choice(vertices).name
+        v2 = random.choice(vertices).name
+        while v2 == v1:
+            v2 = random.choice(vertices).name
+        r_time = random_time()
+        euclidean_result = astar(graph, v1, v2, r_time, euclidean_distance, 't')
+        manhattan_result = astar(graph, v1, v2, r_time, manhattan_distance, 't')
+        chebyshev_result = astar(graph, v1, v2, r_time, chebyshev_distance, 't')
+        if euclidean_result is not None:
+            euclidean_results.append(euclidean_result)
+            manhattan_results.append(manhattan_result)
+            chebyshev_results.append(chebyshev_result)
+    with codecs.open("./statistics_results/astar_heuristic_comparison/euclidean.csv", "w", "utf-8") as f:
+        for result in euclidean_results:
+            path, cost, time = result
+            f.write(f"{len(path)},{cost},{time}\n")
+    with codecs.open("./statistics_results/astar_heuristic_comparison/manhattan.csv", "w", "utf-8") as f:
+        for result in manhattan_results:
+            path, cost, time = result
+            f.write(f"{len(path)},{cost},{time}\n")
+    with codecs.open("statistics_results/astar_heuristic_comparison/chebyshev.csv", "w", "utf-8") as f:
+        for result in chebyshev_results:
+            path, cost, time = result
+            f.write(f"{len(path)},{cost},{time}\n")
 #
 #
 # def compare_astar_change_value_scalar():
@@ -104,4 +104,6 @@ import codecs
 #
 #
 # compare_astar_change_value_scalar()
+
+compare_astar_heuristics_time()
 

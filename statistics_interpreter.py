@@ -20,14 +20,14 @@ def interpret_heuristics_comparison():
         comp_time_mean.append(df.loc[:, 'comp_time'].mean())
 
     x = np.array(["Euclidean", "Manhattan", "Chebyshev"])
-    y = np.array(p_len_mean)
-    plt.title("Średnia długość ścieżki")
-    plt.bar(x, y)
-    plt.savefig("./plots/heuristic_comparison/mean_path_len.png")
-    y = np.array(cost_mean)
-    plt.title("Średni koszt ścieżki")
-    plt.bar(x, y)
-    plt.savefig("./plots/heuristic_comparison/mean_path_cost.png")
+    # y = np.array(p_len_mean)
+    # plt.title("Średnia długość ścieżki")
+    # plt.bar(x, y)
+    # plt.savefig("./plots/heuristic_comparison/mean_path_len.png")
+    # y = np.array(cost_mean)
+    # plt.title("Średni koszt ścieżki")
+    # plt.bar(x, y)
+    # plt.savefig("./plots/heuristic_comparison/mean_path_cost.png")
     y = np.array(comp_time_mean)
     plt.title("Średni czas wykonania")
     plt.bar(x, y)
@@ -96,4 +96,6 @@ def interpret_ch_cost():
     plt.legend()
     plt.savefig("./plots/change_cost/both_time_plot.png")
 
-interpret_ch_cost()
+
+interpret_heuristics_comparison()
+
