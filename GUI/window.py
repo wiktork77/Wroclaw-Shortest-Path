@@ -12,7 +12,6 @@ from PyQt6.QtWidgets import QCompleter
 from algorithms import dijkstra, astar
 from cost_computations import heuristics
 from data_processing import data_presentation
-
 import datetime
 
 
@@ -32,7 +31,7 @@ class Ui_MainWindow(object):
         self.setupAlgorithmChooseUi()
         self.setupPathBuildingCriteriaUi()
         self.setupSearchButton()
-        self.setupResultTableUi()
+        self.setupResultUi()
 
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 645, 26))
@@ -207,10 +206,12 @@ class Ui_MainWindow(object):
 
         self.searchButton.clicked.connect(self.onSearchPressed)
 
-    def setupResultTableUi(self):
-        self.resultTable = QtWidgets.QTableView(parent=self.centralwidget)
-        self.resultTable.setGeometry(QtCore.QRect(20, 340, 601, 341))
-        self.resultTable.setObjectName("resultTable")
+    def setupResultUi(self):
+        self.model = TreeModel(parent=self.centralwidget)
+        self.resultUi = MyTreeView(self.model)
+        self.resultUi.setGeometry(QtCore.QRect(20, 340, 601, 341))
+        self.resultUi.setObjectName("resultUi")
+
 
     def changeVisibilityOfCriteria(self):
         if self.algorithm == 'Dijkstra' or self.algorithm is None:
@@ -246,14 +247,19 @@ class Ui_MainWindow(object):
                 result = None
             path, travel_time, computation_time = result
 
-            data_presentation.print_path_concise(path)
+            # data_presentation.print_path_concise(path)
 
             segmented = data_presentation.segment_path(path)
 
             print()
             print()
 
-            data_presentation.print_path_concise(segmented)
+            # data_presentation.print_path_concise(segmented)
+
+            for seg in segmented:
+                # głównym jest seg[1:3] a pod seg[3]
+                # group_it = self.model.add_group(seg[1].start_stop.name, seg[2].departure_time, seg[1].end_stop.name, seg[2].arrival_time)
+                pass
 
 
     def validateDeparture(self):
@@ -316,3 +322,60 @@ class TimeSpinbox(QtWidgets.QSpinBox):
 
     def textFromValue(self, v: int) -> str:
         return "%02d" % v
+
+
+class MyTreeView(QtWidgets.QTreeView):
+    def __init__(self, model, parent=None):
+        super(MyTreeView, self).__init__(parent)
+        self.setIndentation(0)
+        self.setExpandsOnDoubleClick(False)
+        self.setModel(model)
+        self.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.clicked.connect(self.on_clicked)
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+
+
+    @QtCore.pyqtSlot(QtCore.QModelIndex)
+    def on_clicked(self, index):
+        if not index.parent().isValid() and index.column() == 0:
+            self.setExpanded(index, not self.isExpanded(index))
+
+
+class TreeModel(QtGui.QStandardItemModel):
+    def __init__(self, parent=None):
+        super(TreeModel, self).__init__(parent)
+        self.setColumnCount(4)
+        self.setHorizontalHeaderLabels(["Departure", "Departure time", "Arrival", "Arrival time"])
+
+    def add_group(self, group_name):
+        item_root = QtGui.QStandardItem()
+        item_root.setEditable(False)
+        item = QtGui.QStandardItem(group_name)
+        item.setEditable(False)
+        ii = self.invisibleRootItem()
+        i = ii.rowCount()
+        for j, it in enumerate((item_root, item)):
+            ii.setChild(i, j, it)
+            ii.setEditable(False)
+        for j in range(self.columnCount()):
+            it = ii.child(i, j)
+            if it is None:
+                it = QtGui.QStandardItem()
+                ii.setChild(i, j, it)
+            it.setBackground(QtGui.QColor("#002842"))
+            it.setForeground(QtGui.QColor("#F2F2F2"))
+        return item_root
+
+    def append_element_to_group(self, group_item, texts):
+        j = group_item.rowCount()
+        item_icon = QtGui.QStandardItem()
+        item_icon.setEditable(False)
+        item_icon.setIcon(QtGui.QIcon("game.png"))
+        item_icon.setBackground(QtGui.QColor("#0D1225"))
+        group_item.setChild(j, 0, item_icon)
+        for i, text in enumerate(texts):
+            item = QtGui.QStandardItem(text)
+            item.setEditable(False)
+            item.setBackground(QtGui.QColor("#0D1225"))
+            item.setForeground(QtGui.QColor("#F2F2F2"))
+            group_item.setChild(j, i+1, item)
