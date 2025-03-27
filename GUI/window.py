@@ -10,6 +10,8 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QCompleter
 
 from algorithms import dijkstra, astar
+from cost_computations import heuristics
+from data_processing import data_presentation
 
 import datetime
 
@@ -225,17 +227,33 @@ class Ui_MainWindow(object):
         self.changeVisibilityOfCriteria()
 
     def onCriteriaChange(self, radioButton):
-        self.criteria = radioButton.text()
+        criteriaText = radioButton.text()
+        if criteriaText == "Time minimization":
+            self.criteria = 't'
+        else:
+            self.criteria = 'p'
 
     def onSearchPressed(self):
         if self.validateForm():
             print("Invoking the search")
             departure, arrival = self.departureLineEdit.text(), self.arrivalLineEdit.text()
             time = f"{self.hourSpinBox.text()}:{self.minuteSpinBox.text()}"
-            result = dijkstra.dsp(self.graph, departure, arrival, time)
+            if self.algorithm == "Dijkstra":
+                result = dijkstra.dsp(self.graph, departure, arrival, time)
+            elif self.algorithm == "A*":
+                result = astar.astar(self.graph, departure, arrival, time, heuristics.euclidean_distance, self.criteria)
+            else:
+                result = None
             path, travel_time, computation_time = result
-            for item in path:
-                print(item[1].start_stop, item[1].end_stop, item[2].line)
+
+            data_presentation.print_path_concise(path)
+
+            segmented = data_presentation.segment_path(path)
+
+            print()
+            print()
+
+            data_presentation.print_path_concise(segmented)
 
 
     def validateDeparture(self):
@@ -287,7 +305,7 @@ class Ui_MainWindow(object):
         self.minorLabelFont.setPointSize(9)
 
         self.algorithm = "Dijkstra"
-        self.criteria = "Time minimization"
+        self.criteria = "t"
 
 
 class TimeSpinbox(QtWidgets.QSpinBox):
