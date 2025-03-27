@@ -9,6 +9,11 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QCompleter
 
+from algorithms import dijkstra, astar
+
+import datetime
+
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -42,7 +47,9 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.departureLabel.setText(_translate("MainWindow", "Departure stop"))
+        self.departureErrorLabel.setText(_translate("MainWindow", "Please fill with existing stop"))
         self.arrivalLabel.setText(_translate("MainWindow", "Arrival stop"))
+        self.arrivalErrorLabel.setText(_translate("MainWindow", "Please fill with existing stop"))
         self.timeSeparatorLabel.setText(_translate("MainWindow", ":"))
         self.departureTimeLabel.setText(_translate("MainWindow", "Departure time"))
         self.algorithmLabel.setText(_translate("MainWindow", "Algorithm"))
@@ -64,7 +71,19 @@ class Ui_MainWindow(object):
         self.departureLineEdit.setGeometry(QtCore.QRect(20, 50, 211, 31))
         self.departureLineEdit.setObjectName("departureLineEdit")
 
+        self.departureLineEdit.setStyleSheet("border: 0.035em solid black")
+
+        self.departureErrorLabel = QtWidgets.QLabel(parent=self.centralwidget)
+        self.departureErrorLabel.setGeometry(QtCore.QRect(20, 80, 211, 21))
+        self.departureErrorLabel.setFont(self.majorLabelFont)
+        self.departureErrorLabel.setObjectName("departureErrorLabel")
+        self.departureErrorLabel.setStyleSheet("color: red")
+        self.departureErrorLabel.setVisible(False)
+
         self.departureLineEdit.setCompleter(self.completer)
+
+
+
 
     def setupArrivalUi(self):
         self.arrivalLabel = QtWidgets.QLabel(parent=self.centralwidget)
@@ -76,6 +95,15 @@ class Ui_MainWindow(object):
         self.arrivalLineEdit = QtWidgets.QLineEdit(parent=self.centralwidget)
         self.arrivalLineEdit.setGeometry(QtCore.QRect(410, 50, 211, 31))
         self.arrivalLineEdit.setObjectName("arrivalLineEdit")
+
+        self.arrivalLineEdit.setStyleSheet("border: 0.035em solid black")
+
+        self.arrivalErrorLabel = QtWidgets.QLabel(parent=self.centralwidget)
+        self.arrivalErrorLabel.setGeometry(QtCore.QRect(410, 80, 211, 21))
+        self.arrivalErrorLabel.setFont(self.majorLabelFont)
+        self.arrivalErrorLabel.setObjectName("arrivalErrorLabel")
+        self.arrivalErrorLabel.setStyleSheet("color: red")
+        self.arrivalErrorLabel.setVisible(False)
 
         self.arrivalLineEdit.setCompleter(self.completer)
 
@@ -97,20 +125,24 @@ class Ui_MainWindow(object):
         self.timeSeparatorLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.timeSeparatorLabel.setObjectName("timeSeparatorLabel")
 
-        self.hourSpinBox = QtWidgets.QSpinBox(parent=self.centralwidget)
+        self.hourSpinBox = TimeSpinbox(minVal=0, maxVal=23, parent=self.centralwidget)
         self.hourSpinBox.setGeometry(QtCore.QRect(20, 140, 81, 31))
         self.hourSpinBox.setFont(self.majorLabelFont)
         self.hourSpinBox.setObjectName("hourSpinBox")
         self.hourSpinBox.setMinimum(0)
         self.hourSpinBox.setMaximum(23)
 
-        self.minuteSpinBox = QtWidgets.QSpinBox(parent=self.centralwidget)
+        self.minuteSpinBox = TimeSpinbox(minVal=0, maxVal=59, parent=self.centralwidget)
         self.minuteSpinBox.setGeometry(QtCore.QRect(150, 140, 81, 31))
         self.minuteSpinBox.setFont(self.majorLabelFont)
         self.minuteSpinBox.setObjectName("minuteSpinBox")
         self.minuteSpinBox.setMinimum(0)
-        self.minuteSpinBox.setValue(00)
         self.minuteSpinBox.setMaximum(59)
+
+        time = datetime.datetime.now()
+
+        self.hourSpinBox.setValue(time.hour)
+        self.minuteSpinBox.setValue(time.minute)
 
 
     def setupAlgorithmChooseUi(self):
@@ -132,7 +164,10 @@ class Ui_MainWindow(object):
         self.algorithmGroup.addButton(self.dijkstraRadioButton)
         self.algorithmGroup.addButton(self.aStarRadioButton)
 
+        self.dijkstraRadioButton.click()
+
         self.algorithmGroup.buttonClicked.connect(self.onAlgorithmChange)
+
 
 
 
@@ -153,6 +188,11 @@ class Ui_MainWindow(object):
 
         self.pathBuildCriteriaGroup.addButton(self.transferCountMinimizationRadioButton)
         self.pathBuildCriteriaGroup.addButton(self.timeMinimizationRadioButton)
+
+        self.timeMinimizationRadioButton.click()
+
+        self.pathBuildCriteriaGroup.buttonClicked.connect(self.onCriteriaChange)
+
 
         self.changeVisibilityOfCriteria()
 
@@ -179,31 +219,59 @@ class Ui_MainWindow(object):
             self.pathBuildCriteriaLabel.setEnabled(True)
             self.transferCountMinimizationRadioButton.setEnabled(True)
             self.timeMinimizationRadioButton.setEnabled(True)
-        print(self.algorithm)
 
     def onAlgorithmChange(self, radioButton):
         self.algorithm = radioButton.text()
         self.changeVisibilityOfCriteria()
 
+    def onCriteriaChange(self, radioButton):
+        self.criteria = radioButton.text()
+
     def onSearchPressed(self):
-        print("pressed")
+        if self.validateForm():
+            print("Invoking the search")
+            departure, arrival = self.departureLineEdit.text(), self.arrivalLineEdit.text()
+            time = f"{self.hourSpinBox.text()}:{self.minuteSpinBox.text()}"
+            result = dijkstra.dsp(self.graph, departure, arrival, time)
+            path, travel_time, computation_time = result
+            for item in path:
+                print(item[1].start_stop, item[1].end_stop, item[2].line)
+
 
     def validateDeparture(self):
-        if self.departureLineEdit.text() is None and len(self.departureLineEdit.text()) <= 0:
-            return False
+        isValid = True
+        if self.departureLineEdit.text() not in self.stops:
+            isValid = False
+        self.setValidityStyle(self.departureLineEdit, self.departureErrorLabel, isValid)
+        return isValid
 
     def validateArrival(self):
-        if self.arrivalLineEdit.text() is None and len(self.arrivalLineEdit.text()) <= 0:
-            return False
+        isValid = True
+        if self.arrivalLineEdit.text() not in self.stops:
+            isValid = False
+        self.setValidityStyle(self.arrivalLineEdit, self.arrivalErrorLabel, isValid)
+        return isValid
 
-    def validateTime(self):
-        pass
+    def setValidityStyle(self, input, errorLabel, isValid):
+        if isValid:
+            input.setStyleSheet("border: 0.035em solid black")
+            errorLabel.setVisible(False)
+        else:
+            input.setStyleSheet("border: 0.035em solid red")
+            errorLabel.setVisible(True)
 
-    def validateAlgorithm(self):
-        pass
+    def validateForm(self):
+        isValid = True
 
-    def validateCriteria(self):
-        pass
+        validators = [
+            self.validateDeparture,
+            self.validateArrival,
+        ]
+
+        for validator in validators:
+            if not validator():
+                isValid = False
+        return isValid
 
     def __init__(self, graph):
         self.graph = graph
@@ -218,4 +286,15 @@ class Ui_MainWindow(object):
         self.minorLabelFont = QtGui.QFont()
         self.minorLabelFont.setPointSize(9)
 
-        self.algorithm = None
+        self.algorithm = "Dijkstra"
+        self.criteria = "Time minimization"
+
+
+class TimeSpinbox(QtWidgets.QSpinBox):
+    def __init__(self, minVal, maxVal, parent):
+        QtWidgets.QSpinBox.__init__(self, parent=parent)
+
+        self.setRange(minVal, maxVal)
+
+    def textFromValue(self, v: int) -> str:
+        return "%02d" % v
