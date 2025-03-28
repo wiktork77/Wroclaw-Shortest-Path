@@ -207,10 +207,19 @@ class Ui_MainWindow(object):
         self.searchButton.clicked.connect(self.onSearchPressed)
 
     def setupResultUi(self):
-        self.model = TreeModel(parent=self.centralwidget)
-        self.resultUi = MyTreeView(self.model)
-        self.resultUi.setGeometry(QtCore.QRect(20, 340, 601, 341))
-        self.resultUi.setObjectName("resultUi")
+        self.treeView = QtWidgets.QTreeView(parent=self.centralwidget)
+        self.treeView.setGeometry(QtCore.QRect(20, 340, 601, 341))
+
+        self.treeModel = QtGui.QStandardItemModel()
+        self.treeModel.setColumnCount(5)
+        self.treeModel.setHorizontalHeaderLabels(["Departure stop", "Departure time", "Arrival stop", "Arrival time", "Line"])
+
+        self.rootNode = self.treeModel.invisibleRootItem()
+
+        self.treeView.setModel(self.treeModel)
+        self.treeView.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+
+
 
 
     def changeVisibilityOfCriteria(self):
@@ -247,19 +256,39 @@ class Ui_MainWindow(object):
                 result = None
             path, travel_time, computation_time = result
 
-            # data_presentation.print_path_concise(path)
+            data_presentation.print_path_concise(path)
+
+            print()
+            print()
 
             segmented = data_presentation.segment_path(path)
 
+            data_presentation.print_path_concise(segmented)
+
             print()
             print()
 
-            # data_presentation.print_path_concise(segmented)
+            self.treeModel.removeRows(0, self.treeModel.rowCount())
 
             for seg in segmented:
-                # głównym jest seg[1:3] a pod seg[3]
-                # group_it = self.model.add_group(seg[1].start_stop.name, seg[2].departure_time, seg[1].end_stop.name, seg[2].arrival_time)
-                pass
+                stopNameItem = StandardItem(f'{seg[1].start_stop.name}')
+                self.rootNode.appendRow(
+                    [
+                        stopNameItem,
+                        StandardItem(f'{data_presentation.datetime_to_day_time(seg[2].departure_time)}'),
+                        StandardItem(f'{seg[1].end_stop.name}'),
+                        StandardItem(f'{data_presentation.datetime_to_day_time(seg[2].arrival_time)}'),
+                        StandardItem(f'{seg[2].line}')
+                    ]
+                )
+
+                for stop in seg[3]:
+                    stopNameItem.appendRow(
+                        [
+                            StandardItem(stop[0]),
+                            StandardItem(data_presentation.datetime_to_day_time(stop[1])),
+                        ]
+                    )
 
 
     def validateDeparture(self):
@@ -324,58 +353,7 @@ class TimeSpinbox(QtWidgets.QSpinBox):
         return "%02d" % v
 
 
-class MyTreeView(QtWidgets.QTreeView):
-    def __init__(self, model, parent=None):
-        super(MyTreeView, self).__init__(parent)
-        self.setIndentation(0)
-        self.setExpandsOnDoubleClick(False)
-        self.setModel(model)
-        self.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.clicked.connect(self.on_clicked)
-        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-
-
-    @QtCore.pyqtSlot(QtCore.QModelIndex)
-    def on_clicked(self, index):
-        if not index.parent().isValid() and index.column() == 0:
-            self.setExpanded(index, not self.isExpanded(index))
-
-
-class TreeModel(QtGui.QStandardItemModel):
-    def __init__(self, parent=None):
-        super(TreeModel, self).__init__(parent)
-        self.setColumnCount(4)
-        self.setHorizontalHeaderLabels(["Departure", "Departure time", "Arrival", "Arrival time"])
-
-    def add_group(self, group_name):
-        item_root = QtGui.QStandardItem()
-        item_root.setEditable(False)
-        item = QtGui.QStandardItem(group_name)
-        item.setEditable(False)
-        ii = self.invisibleRootItem()
-        i = ii.rowCount()
-        for j, it in enumerate((item_root, item)):
-            ii.setChild(i, j, it)
-            ii.setEditable(False)
-        for j in range(self.columnCount()):
-            it = ii.child(i, j)
-            if it is None:
-                it = QtGui.QStandardItem()
-                ii.setChild(i, j, it)
-            it.setBackground(QtGui.QColor("#002842"))
-            it.setForeground(QtGui.QColor("#F2F2F2"))
-        return item_root
-
-    def append_element_to_group(self, group_item, texts):
-        j = group_item.rowCount()
-        item_icon = QtGui.QStandardItem()
-        item_icon.setEditable(False)
-        item_icon.setIcon(QtGui.QIcon("game.png"))
-        item_icon.setBackground(QtGui.QColor("#0D1225"))
-        group_item.setChild(j, 0, item_icon)
-        for i, text in enumerate(texts):
-            item = QtGui.QStandardItem(text)
-            item.setEditable(False)
-            item.setBackground(QtGui.QColor("#0D1225"))
-            item.setForeground(QtGui.QColor("#F2F2F2"))
-            group_item.setChild(j, i+1, item)
+class StandardItem(QtGui.QStandardItem):
+    def __init__(self, txt=''):
+        super().__init__()
+        self.setText(txt)
