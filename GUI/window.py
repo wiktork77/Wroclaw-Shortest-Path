@@ -330,7 +330,7 @@ class Ui_MainWindow(object):
         self.graph = graph
         self.stops = graph.get_vertices_names()
 
-        self.completer = QCompleter(sorted(self.stops))
+        self.completer = QCompleter(sorted(self.stops, key=str.casefold))
         self.completer.setCaseSensitivity(QtCore.Qt.CaseSensitivity.CaseInsensitive)
 
         self.majorLabelFont = QtGui.QFont()
