@@ -12,6 +12,7 @@ from PyQt6.QtWidgets import QCompleter
 from algorithms import dijkstra, astar
 from cost_computations import heuristics
 from data_processing import data_presentation
+from data_processing import data_utilities
 import datetime
 
 
@@ -219,6 +220,11 @@ class Ui_MainWindow(object):
         self.treeView.setModel(self.treeModel)
         self.treeView.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
 
+        self.computationTimeLabel = QtWidgets.QLabel(parent=self.centralwidget)
+        self.computationTimeLabel.setGeometry(QtCore.QRect(20, 682, 201, 21))
+        self.computationTimeLabel.setFont(self.minorLabelFont)
+        self.computationTimeLabel.setObjectName("computationTimeLabel")
+
 
 
 
@@ -256,18 +262,10 @@ class Ui_MainWindow(object):
                 result = None
             path, travel_time, computation_time = result
 
-            data_presentation.print_path_concise(path)
-
-            print()
-            print()
-
             segmented = data_presentation.segment_path(path)
 
-            data_presentation.print_path_concise(segmented)
-
-            print()
-            print()
-
+            # data_presentation.print_path_concise(segmented)
+            print(travel_time)
             self.treeModel.removeRows(0, self.treeModel.rowCount())
 
             for seg in segmented:
@@ -290,6 +288,28 @@ class Ui_MainWindow(object):
                         ]
                     )
 
+            self.rootNode.appendRow(
+                [
+                    StandardItem(f''),
+                    StandardItem(f''),
+                    StandardItem(f''),
+                    StandardItem(f''),
+                    StandardItem(f''),
+                ]
+            )
+
+            self.rootNode.appendRow(
+                [
+                    StandardItem(f'Departure:'),
+                    StandardItem(f'{data_presentation.datetime_to_day_time(segmented[0][2].departure_time)}', isBold=True),
+                    StandardItem(f'Arrival:'),
+                    StandardItem(f'{data_presentation.datetime_to_day_time(segmented[-1][2].arrival_time)}', isBold=True),
+                    StandardItem(f'{data_utilities.convert_minutes_to_hourminute(int(travel_time))}', isBold=True),
+                ]
+            )
+            computation_time = computation_time*1000
+            computation_time = float(str(computation_time)[:4])
+            self.computationTimeLabel.setText(f"Computation time: {computation_time}ms")
 
     def validateDeparture(self):
         isValid = True
@@ -354,6 +374,9 @@ class TimeSpinbox(QtWidgets.QSpinBox):
 
 
 class StandardItem(QtGui.QStandardItem):
-    def __init__(self, txt=''):
+    def __init__(self, txt='', isBold=False):
         super().__init__()
         self.setText(txt)
+        font = QtGui.QFont()
+        font.setBold(isBold)
+        self.setFont(font)

@@ -109,4 +109,10 @@ def count_line_changes(path):
 
 
 
-
+def convert_minutes_to_hourminute(minutes):
+    if minutes > 59:
+        hours = minutes // 60
+        minutes_left = minutes - 60*hours
+        return f'{hours}h {minutes_left}min'
+    else:
+        return f'{minutes}min'
