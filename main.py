@@ -1,5 +1,5 @@
 import sys
-
+import argparse
 from GUI.window import Ui_MainWindow
 from data_processing.data_modelling import model_graph
 from data_processing.data_utilities import retrieve_data, count_line_changes
@@ -10,7 +10,7 @@ from algorithms.astar import astar
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
-def run1():
+def run_console():
     print("Reading data...")
     df = retrieve_data("connection_graph_unique.csv")
     graph = model_graph(df)
@@ -34,7 +34,7 @@ def run1():
             print(f"Liczba przesiadek: {count_line_changes(path)}")
 
 
-def run():
+def run_gui():
     df = retrieve_data("connection_graph_unique.csv")
     graph = model_graph(df)
 
@@ -47,7 +47,17 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser(description='Shortest path between Wrocław city stops program')
+    parser.add_argument('--mode', action='store', dest='mode', default='gui')
 
+    args = parser.parse_args()
 
+    mode = args.mode
+
+    if mode == 'console':
+        run_console()
+    elif mode == 'gui':
+        run_gui()
+    else:
+        print("allowed arguments for --mode: [gui, console]")
 
