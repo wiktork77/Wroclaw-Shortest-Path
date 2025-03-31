@@ -14,7 +14,7 @@ The dataset includes:
 📅 The data used in this project is from **March 1, 2023**.  
 
 ### 🔍 Simplifications  
-🚫 The program assumes that users travel **exclusively by public transport**, as the dataset only includes public transport stops. Therefore, **nearby stops that could be reached on foot to further minimize travel time are not considered unless they are directly connected to the current stop**.
+🚫 The program assumes that users travel **exclusively by public transport**, as the dataset only includes public transport stops. Therefore, **nearby stops that could be reached on foot to further minimize travel time are not considered unless they are directly connected to the current stop**.  
 📍 **Stop Merging:** All stops with the same name were merged, and their geographic coordinates were averaged to avoid inefficient routing, e.g. at "Plac Grunwaldzki" multiple stops.  
 
 ---
