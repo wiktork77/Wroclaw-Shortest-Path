@@ -28,7 +28,7 @@ The application is primarily designed to search for **public transport connectio
 ✔️ A **classical, optimal**, but **slower** algorithm for finding the shortest path.  
 ✔️ **Always optimizes routes based on travel time.**  
 
-#### 🔵 **A* Algorithm**  
+#### 🔵 **A\* Algorithm**  
 ✔️ A **heuristic-based, faster** algorithm for finding the shortest path.  
 ✔️ Uses heuristics to estimate path costs.  
 ✔️ **Euclidean distance** is used as an effective heuristic.  
