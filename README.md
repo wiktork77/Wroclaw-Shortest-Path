@@ -66,7 +66,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### ⚡ Running the Application  
+### Running the Application  
 The application can be launched with an optional **`--mode`** argument:  
 ```bash
 python main.py --mode console
@@ -76,8 +76,8 @@ python main.py --mode console
 ---
 
 ## 📑 Detailed Description of Libraries, Scripts, and Algorithms  
-📄 A document containing a **detailed problem analysis** and **explanation of the implemented solutions** is included with the project:  
-- 📘 [**Documentation**](documentation/SPDocumentation.pdf)  
-- 📙 [**Documentation (Polish)**](documentation/SPDocumentation_PL.pdf)  
+A document containing a **detailed problem analysis** and **explanation of the implemented solutions** is included with the project:  
+- [**Documentation**](documentation/SPDocumentation.pdf)  
+- [**Documentation (Polish)**](documentation/SPDocumentation_PL.pdf)  
 
 ---
