@@ -4,63 +4,63 @@ The goal of this project was to **implement a public transport route search syst
 ---
 
 ## 📂 Data  
-The program is based on the **`connection_graph.csv`** file, located in **`data_sources`** directory, which was created by merging datasets available from [**"Open Data Wrocław"**](https://opendata.cui.wroclaw.pl/dataset/rozkladjazdytransportupublicznegoplik_data).  
+The program is based on the **`connection_graph.csv`** file, located in the **`data_sources`** directory, which was created by merging datasets available from [**Open Data Wrocław**](https://opendata.cui.wroclaw.pl/dataset/rozkladjazdytransportupublicznegoplik_data).  
 The dataset includes:  
-✅ **Stops and their geographical locations**  
-✅ **Connections between stops**  
-✅ **Departure and arrival times**  
-✅ **Transit lines operating on these routes**  
+- **Stops and their geographical locations**  
+- **Connections between stops**  
+- **Departure and arrival times**  
+- **Transit lines operating on these routes**  
 
-📅 The data used in this project is from **March 1, 2023**.  
+The data used in this project is from **March 1, 2023**.  
 
-### 🔍 Simplifications  
-🚫 The program assumes that users travel **exclusively by public transport**, as the dataset only includes public transport stops. Therefore, **nearby stops that could be reached on foot to further minimize travel time are not considered unless they are directly connected to the current stop**.  
+### Simplifications  
+The program assumes that users travel **exclusively by public transport**, as the dataset only includes public transport stops. Therefore, **nearby stops that could be reached on foot are not considered unless directly connected to the current stop**.  
 
-📍 **Stop Merging:** All stops with the same name were merged, and their geographic coordinates were averaged to avoid inefficient routing, e.g. at "Plac Grunwaldzki" multiple stops.  
+**Stop Merging:** All stops with the same name were merged, and their geographic coordinates were averaged to avoid inefficient routing, e.g., at "Plac Grunwaldzki".
 
 ---
 
 ## ⚙️ Application Features  
-The application is primarily designed to search for **public transport connections within Wrocław**. However, several customization options are available to modify the search criteria:  
+The application is primarily designed to search for **public transport connections within Wrocław**, with several customization options available:  
 
-### 🔢 Algorithm Selection  
+### Algorithm Selection  
 
-#### 🟢 **Dijkstra's Algorithm**  
-✔️ A **classical, optimal**, but **slower** algorithm for finding the shortest path.  
-✔️ **Always optimizes routes based on travel time.**  
+#### Dijkstra's Algorithm  
+- A **classical, optimal**, but **slower** algorithm.  
+- **Always optimizes routes based on travel time.**  
 
-#### 🔵 **A\* Algorithm**  
-✔️ A **heuristic-based, faster** algorithm for finding the shortest path.  
-✔️ Uses heuristics to estimate path costs.  
-✔️ **Euclidean distance** is used as an effective heuristic.  
-✔️ Can optimize based on **travel time** or **number of transfers**.  
+#### A\* Algorithm  
+- A **heuristic-based, faster** algorithm.  
+- Uses heuristics to estimate path costs.  
+- **Euclidean distance** is used as a heuristic.  
+- Can optimize based on **travel time** or **number of transfers**.  
 
-### 🎯 Optimization Criteria  
+### Optimization Criteria  
 
-#### ⏳ **Optimization by Travel Time**  
-✅ Minimizes the **total travel time** without considering the number of transfers.  
-⚠️ May lead to **excessive transfers** as comfort is not a factor.  
+#### Optimization by Travel Time  
+- Minimizes the **total travel time**.  
+- May lead to **excessive transfers**, as comfort is not considered.  
 
-#### 🔄 **Optimization by Number of Transfers**  
-✅ Minimizes the **travel time and number of transfers**.  
-✅ Prioritizes staying on the same bus/tram if it doesn't significantly increase travel time.  
-🔬 **Experimental approach** (described in project documentation).  
+#### Optimization by Number of Transfers  
+- Minimizes both **travel time** and **number of transfers**.  
+- Prioritizes staying on the same vehicle, if efficient.  
+- **Experimental approach** (described in documentation).  
 
-### ⏰ Departure Time Selection  
-🕒 By default, the program uses **local time**.  
-📆 Users can **select a departure time** to plan future trips or review past departures.  
+### Departure Time Selection  
+- By default, the program uses **local time**.  
+- Users can **select a departure time** to plan trips.  
 
-### 🔎 Step-by-Step Route Breakdown  
-📊 After execution, the algorithm presents travel data as **route segments**, where each segment represents a single transit line.  
-📜 If a line passes through multiple stops, users can **expand details** to view intermediate stops.  
+### Step-by-Step Route Breakdown  
+- The algorithm presents data as **route segments**, each representing a single transit line.  
+- If a line passes through many stops, users can **expand details** to view intermediate stops.  
 
 ---
 
 ## 🚀 Application Setup Instructions  
 The application was developed using **Python 3.10.9**. If execution fails, using this version is recommended.  
 
-### 📥 Installation  
-Navigate to the project's main folder (where `main.py` is located) and run the following commands:  
+### Installation  
+Navigate to the project's main folder (where `main.py` is located) and run:  
 ```bash
 pip install -r requirements.txt
 python main.py
